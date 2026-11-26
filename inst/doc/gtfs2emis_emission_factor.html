@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+<meta name="date" content="2026-11-26" />
+
+<title>Exploring Emission Factors</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Exploring Emission Factors</h1>
+<h4 class="date">2026-11-26</h4>
+
+
+
+<p>An emission factor (EF) is the mass of a pollutant a vehicle emits
+per kilometre travelled (g/km). It depends on the vehicle’s
+characteristics (type, age, fuel, technology) and, in most models, on
+its speed. Environmental agencies estimate these relations from local
+measurements, and the choice of model can change emission estimates
+considerably. This vignette shows how to explore the emission factors
+available in <code>gtfs2emis</code>.</p>
+<div id="available-emission-factor-models" class="section level2">
+<h2>Available emission factor models</h2>
+<p><code>gtfs2emis</code> includes hot-exhaust emission factors from
+four environmental agencies. The links below lead to the agencies’
+reports on how the factors were derived.</p>
+<p><strong>Hot-exhaust emissions</strong></p>
+<ul>
+<li>Brazil, Environmental Company of São Paulo: <a href="https://cetesb.sp.gov.br/veicular/">CETESB</a></li>
+<li>United States, Environmental Protection Agency: <a href="https://www.epa.gov/moves">MOVES3</a></li>
+<li>United States, California Air Resources Board: <a href="https://emfac.arb.ca.gov/emissions-inventory/">EMFAC2017</a></li>
+<li>Europe, European Environment Agency: <a href="https://www.eea.europa.eu//publications/emep-eea-guidebook-2019">EMEP/EEA</a></li>
+</ul>
+<p><strong>Wear emissions (tyre, brake and road wear)</strong></p>
+<ul>
+<li>Europe, European Environment Agency: <a href="https://www.eea.europa.eu//publications/emep-eea-guidebook-2019">EMEP/EEA</a></li>
+</ul>
+</div>
+<div id="visualizing-emission-factor-data" class="section level2">
+<h2>Visualizing emission factor data</h2>
+<p>Emission factors depend on fleet characteristics (see the <a href="https://ipea.github.io/gtfs2emis/articles/gtfs2emis_fleet_data.html">fleet
+data vignette</a>). In this section we use <code>ef_europe_emep()</code>
+with three types of urban bus (Midi, Standard and Articulated) to show
+how emission factors vary with vehicle type, speed and pollutant.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(units)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;units&#39; was built under R version 4.6.1</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(gtfs2emis)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt; Warning: package &#39;ggplot2&#39; was built under R version 4.6.1</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>ef_europe <span class="ot">&lt;-</span> <span class="fu">ef_europe_emep</span>(<span class="at">speed =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">10</span><span class="sc">:</span><span class="dv">100</span>, <span class="st">&quot;km/h&quot;</span>),</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>                            <span class="at">veh_type =</span> <span class="fu">c</span>(<span class="st">&quot;Ubus Midi &lt;=15 t&quot;</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>                                         <span class="st">&quot;Ubus Std 15 - 18 t&quot;</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>                                         <span class="st">&quot;Ubus Artic &gt;18 t&quot;</span>),</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>                            <span class="at">euro =</span> <span class="fu">c</span>(<span class="st">&quot;III&quot;</span>, <span class="st">&quot;IV&quot;</span>, <span class="st">&quot;V&quot;</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>                            <span class="at">pollutant =</span> <span class="fu">c</span>(<span class="st">&quot;PM10&quot;</span>, <span class="st">&quot;NOx&quot;</span>),</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>                            <span class="at">fuel =</span> <span class="fu">c</span>(<span class="st">&quot;D&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;D&quot;</span>),</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>                            <span class="at">tech =</span> <span class="fu">c</span>(<span class="st">&quot;-&quot;</span>, <span class="st">&quot;SCR&quot;</span>, <span class="st">&quot;SCR&quot;</span>),</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>                            <span class="at">as_list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="fu">names</span>(ef_europe)</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;pollutant&quot; &quot;veh_type&quot;  &quot;euro&quot;      &quot;fuel&quot;      &quot;tech&quot;      &quot;process&quot;  </span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;slope&quot;     &quot;load&quot;      &quot;speed&quot;     &quot;EF&quot;</span></span></code></pre></div>
+<p>With <code>as_list = TRUE</code>, the function returns a
+<code>list</code> with the emission factors and the inputs used to
+compute them (see <code>names(ef_europe)</code> above).
+<code>emis_to_dt()</code> turns it into a table, which is easier to
+inspect and plot:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>ef_europe_dt <span class="ot">&lt;-</span> <span class="fu">emis_to_dt</span>(<span class="at">emi_list =</span> ef_europe,</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>                           <span class="at">emi_vars =</span> <span class="st">&quot;EF&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                           <span class="at">veh_vars =</span> <span class="fu">c</span>(<span class="st">&quot;veh_type&quot;</span>, <span class="st">&quot;euro&quot;</span>, <span class="st">&quot;fuel&quot;</span>, <span class="st">&quot;tech&quot;</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                           <span class="at">pol_vars =</span> <span class="st">&quot;pollutant&quot;</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>                           <span class="at">segment_vars =</span> <span class="fu">c</span>(<span class="st">&quot;slope&quot;</span>, <span class="st">&quot;load&quot;</span>, <span class="st">&quot;speed&quot;</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">head</span>(ef_europe_dt)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt;            veh_type   euro   fuel   tech pollutant               EF     process</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt;              &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;    &lt;char&gt;          &lt;units&gt;      &lt;char&gt;</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; 1: Ubus Midi &lt;=15 t    III      D      -      PM10 0.2559070 [g/km] hot_exhaust</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; 2: Ubus Midi &lt;=15 t    III      D      -      PM10 0.2559070 [g/km] hot_exhaust</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; 3: Ubus Midi &lt;=15 t    III      D      -      PM10 0.2413421 [g/km] hot_exhaust</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; 4: Ubus Midi &lt;=15 t    III      D      -      PM10 0.2285624 [g/km] hot_exhaust</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; 5: Ubus Midi &lt;=15 t    III      D      -      PM10 0.2172637 [g/km] hot_exhaust</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; 6: Ubus Midi &lt;=15 t    III      D      -      PM10 0.2072074 [g/km] hot_exhaust</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;    slope  load     speed</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;    &lt;num&gt; &lt;num&gt;   &lt;units&gt;</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; 1:     0   0.5 10 [km/h]</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; 2:     0   0.5 11 [km/h]</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; 3:     0   0.5 12 [km/h]</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; 4:     0   0.5 13 [km/h]</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; 5:     0   0.5 14 [km/h]</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; 6:     0   0.5 15 [km/h]</span></span></code></pre></div>
+<p>The plot below shows how the emission factors change with speed for
+each vehicle type (<code>veh_type</code>) and Euro standard
+(<code>euro</code>):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>ef_europe_dt<span class="sc">$</span>name_fleet <span class="ot">&lt;-</span> <span class="fu">paste</span>(ef_europe_dt<span class="sc">$</span>veh_type, <span class="st">&quot;/ Euro&quot;</span>, ef_europe_dt<span class="sc">$</span>euro)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># plot</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">ggplot</span>(ef_europe_dt) <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> speed, <span class="at">y =</span> EF, <span class="at">color =</span> name_fleet)) <span class="sc">+</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">color =</span> <span class="st">&quot;Category / EURO&quot;</span>) <span class="sc">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>pollutant, <span class="at">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="sc">+</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>Sometimes the database has no emission factor for the exact
+combination requested. In <code>ef_europe_emep()</code>, if the
+technology (<code>tech</code>) is not available for a given vehicle
+type, Euro standard and pollutant, the function uses an available
+technology instead and prints a message saying which one. In the example
+below, there is no <code>CO2</code> factor for technology
+<code>&quot;DPF+SCR&quot;</code>. You can either accept the substitution or choose
+a combination of <code>veh_type</code>, <code>euro</code>,
+<code>tech</code> and <code>pollutant</code> that exists in the
+database.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>ef_europe_co2 <span class="ot">&lt;-</span> <span class="fu">ef_europe_emep</span>(<span class="at">speed =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">10</span><span class="sc">:</span><span class="dv">100</span>, <span class="st">&quot;km/h&quot;</span>),</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                                <span class="at">veh_type =</span> <span class="st">&quot;Ubus Std 15 - 18 t&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                                <span class="at">euro =</span> <span class="st">&quot;VI&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                                <span class="at">pollutant =</span> <span class="st">&quot;CO2&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>                                <span class="at">tech =</span> <span class="st">&quot;DPF+SCR&quot;</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>                                <span class="at">as_list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; &quot;CO2&quot; emission factor not found for technology &quot;DPF+SCR&quot; and Euro &quot;VI&quot;.</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; ℹ The package assumed &#39;SCR&#39; Technology entry. Check `data(ef_europe_emep_db)`</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;   for available data.</span></span></code></pre></div>
+<p>The other EF functions, <code>ef_usa_emfac()</code>,
+<code>ef_usa_moves()</code> and <code>ef_brazil_cetesb()</code>, work in
+a similar way. See their documentation for details.</p>
+<div id="scaling-emission-factors-making-local-factors-speed-dependent" class="section level3">
+<h3>Scaling emission factors: making local factors speed-dependent</h3>
+<p>The MOVES3, EMEP/EEA and EMFAC2017 emission factors depend on speed.
+The CETESB factors for Brazil (<code>ef_brazil_cetesb()</code>) do not.
+With <code>ef_scaled_euro()</code>, you can scale a local emission
+factor so that it varies with speed in the same way as the EMEP/EEA
+factor:</p>
+<p><span class="math display">\[
+EF_{scaled} (V) = EF_{local} \times \frac{EF_{euro}(V)}{EF_{euro}(SDC)},
+\]</span></p>
+<p>where <span class="math inline">\(EF_{scaled}(V)\)</span> is the
+scaled emission factor at speed <span class="math inline">\(V\)</span>,
+<span class="math inline">\(EF_{local}\)</span> is the local emission
+factor, and <span class="math inline">\(EF_{euro}(V)\)</span> and <span class="math inline">\(EF_{euro}(SDC)\)</span> are the EMEP/EEA emission
+factors at speed <span class="math inline">\(V\)</span> and at the
+average urban driving speed <span class="math inline">\(SDC\)</span> (19
+km/h by default). With the default flat road and load of 0.5, the scaled
+factor equals the local one at <span class="math inline">\(V =
+SDC\)</span>.</p>
+<p>To see this, we compare <span class="math inline">\(EF_{local}\)</span>, <span class="math inline">\(EF_{scaled}(V)\)</span> and the reference <span class="math inline">\(EF_{euro}(V)\)</span> in five steps:</p>
+<ol style="list-style-type: decimal">
+<li>Build a fleet <code>data.frame</code> that matches each vehicle in
+the local model to a vehicle in the European model</li>
+</ol>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>fleet_filepath <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/bra_cur_fleet.txt&quot;</span>, <span class="at">package =</span> <span class="st">&quot;gtfs2emis&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>cur_fleet <span class="ot">&lt;-</span> <span class="fu">read.table</span>(fleet_filepath, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span> <span class="st">&quot;,&quot;</span>, <span class="at">nrows =</span> <span class="dv">1</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>cur_fleet</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt;   year euro shape_id type_name_br           veh_type total fuel</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; 1 2006  III     1849  BUS_URBAN_D Ubus Std 15 - 18 t     2    D</span></span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Estimate local emission factors</li>
+</ol>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>cur_local_ef <span class="ot">&lt;-</span> <span class="fu">ef_brazil_cetesb</span>(<span class="at">pollutant =</span> <span class="st">&quot;CO2&quot;</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>                                 <span class="at">veh_type =</span> cur_fleet<span class="sc">$</span>type_name_br,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>                                 <span class="at">model_year =</span> cur_fleet<span class="sc">$</span>year)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">head</span>(cur_local_ef)</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; $pollutant</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;CO2&quot;</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; $veh_type</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;BUS_URBAN_D&quot;</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; $model_year</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; [1] 2006</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; $EF</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; Units: [g/km]</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt;      CO2_2006</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; [1,] 1385.626</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; $process</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;hot_exhaust&quot;</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co"># convert local EF to data.frame</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>cur_local_ef_dt <span class="ot">&lt;-</span> <span class="fu">emis_to_dt</span>(<span class="at">emi_list =</span> cur_local_ef,</span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>                              <span class="at">emi_vars =</span> <span class="st">&quot;EF&quot;</span>)</span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Estimate the European emission factors with
+<code>ef_europe_emep()</code></li>
+</ol>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Euro EF</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>cur_euro_ef <span class="ot">&lt;-</span> <span class="fu">ef_europe_emep</span>(<span class="at">speed =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">10</span><span class="sc">:</span><span class="dv">100</span>, <span class="st">&quot;km/h&quot;</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>                              <span class="at">veh_type =</span> cur_fleet<span class="sc">$</span>veh_type,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>                              <span class="at">euro =</span> cur_fleet<span class="sc">$</span>euro,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>                              <span class="at">pollutant =</span> <span class="st">&quot;CO2&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>                              <span class="at">tech =</span> <span class="st">&quot;-&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co"># convert to data.frame</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>cur_euro_ef_dt <span class="ot">&lt;-</span> <span class="fu">emis_to_dt</span>(<span class="at">emi_list =</span> cur_euro_ef,</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>                             <span class="at">emi_vars =</span> <span class="st">&quot;EF&quot;</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>                             <span class="at">veh_vars =</span> <span class="fu">c</span>(<span class="st">&quot;veh_type&quot;</span>, <span class="st">&quot;euro&quot;</span>, <span class="st">&quot;fuel&quot;</span>, <span class="st">&quot;tech&quot;</span>),</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>                             <span class="at">segment_vars =</span> <span class="st">&quot;speed&quot;</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>cur_euro_ef_dt<span class="sc">$</span>source <span class="ot">&lt;-</span> <span class="st">&quot;Euro EF&quot;</span></span></code></pre></div>
+<ol start="4" style="list-style-type: decimal">
+<li>Apply <code>ef_scaled_euro()</code></li>
+</ol>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>cur_scaled_ef <span class="ot">&lt;-</span> <span class="fu">ef_scaled_euro</span>(<span class="at">ef_local =</span> cur_local_ef<span class="sc">$</span>EF,</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>                                <span class="at">speed =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">10</span><span class="sc">:</span><span class="dv">100</span>, <span class="st">&quot;km/h&quot;</span>),</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>                                <span class="at">veh_type =</span> cur_fleet<span class="sc">$</span>veh_type,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>                                <span class="at">euro =</span> cur_fleet<span class="sc">$</span>euro,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>                                <span class="at">pollutant =</span> <span class="st">&quot;CO2&quot;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>                                <span class="at">tech =</span> <span class="st">&quot;-&quot;</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co"># convert to data.frame</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>cur_scaled_ef_dt <span class="ot">&lt;-</span> <span class="fu">emis_to_dt</span>(<span class="at">emi_list =</span> cur_scaled_ef,</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>                               <span class="at">emi_vars =</span> <span class="st">&quot;EF&quot;</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>                               <span class="at">veh_vars =</span> <span class="fu">c</span>(<span class="st">&quot;veh_type&quot;</span>, <span class="st">&quot;euro&quot;</span>, <span class="st">&quot;fuel&quot;</span>, <span class="st">&quot;tech&quot;</span>),</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>                               <span class="at">segment_vars =</span> <span class="st">&quot;speed&quot;</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>cur_scaled_ef_dt<span class="sc">$</span>source <span class="ot">&lt;-</span> <span class="st">&quot;Scaled EF&quot;</span></span></code></pre></div>
+<ol start="5" style="list-style-type: decimal">
+<li>Plot the three emission factors</li>
+</ol>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># rbind data</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>cur_ef <span class="ot">&lt;-</span> <span class="fu">rbind</span>(cur_euro_ef_dt, cur_scaled_ef_dt)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>cur_ef<span class="sc">$</span>source <span class="ot">&lt;-</span> <span class="fu">factor</span>(cur_ef<span class="sc">$</span>source, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Scaled EF&quot;</span>, <span class="st">&quot;Euro EF&quot;</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co"># plot</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="co"># add scaled and Euro EF</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> cur_ef,</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> speed, <span class="at">y =</span> EF, <span class="at">group =</span> source, <span class="at">color =</span> source)) <span class="sc">+</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>  <span class="co"># add local EF</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="fu">aes</span>(<span class="at">yintercept =</span> cur_local_ef_dt<span class="sc">$</span>EF),</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>             <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>) <span class="sc">+</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">19</span>, <span class="st">&quot;km/h&quot;</span>), <span class="at">y =</span> cur_local_ef<span class="sc">$</span>EF)) <span class="sc">+</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>  <span class="co"># add local EF text</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">19</span>, <span class="st">&quot;km/h&quot;</span>), <span class="at">y =</span> cur_local_ef_dt<span class="sc">$</span>EF),</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>            <span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">&quot;Local EF = %s g/km at 19 km/h&quot;</span>, <span class="fu">round</span>(cur_local_ef_dt<span class="sc">$</span>EF, <span class="dv">1</span>)),</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">nudge_y =</span> <span class="dv">100</span>, <span class="at">nudge_x =</span> <span class="dv">1</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>, <span class="at">fontface =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>  <span class="co"># plot settings</span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;blue&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">max</span>(cur_scaled_ef_dt<span class="sc">$</span>EF))) <span class="sc">+</span></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">color =</span> <span class="cn">NULL</span>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>The scaled EF equals the local EF (dashed line) at 19 km/h and
+follows the same speed curve as the Euro EF.</p>
+</div>
+</div>
+<div id="emission-factor-databases-in-gtfs2emis" class="section level2">
+<h2>Emission factor databases in <code>gtfs2emis</code></h2>
+<p>The hot-exhaust emission factor databases included in the package can
+be loaded with:</p>
+<ul>
+<li><code>data(ef_brazil_cetesb_db)</code> from Environmental Company of
+São Paulo, Brazil (CETESB)</li>
+<li><code>data(ef_usa_moves_db)</code> from MOtor Vehicle Emission
+Simulator (MOVES)</li>
+<li><code>data(ef_usa_emfac_db)</code> from California Air Resources
+Board (EMFAC Model)</li>
+<li><code>data(ef_europe_emep_db)</code> from European Environment
+Agency (EMEP/EEA)</li>
+</ul>
+<p>These data were downloaded from the agencies’ websites and software
+and pre-processed for the emission factor functions. The processing
+scripts are in the <a href="https://github.com/ipea/gtfs2emis/tree/master/data-raw">gtfs2emis
+GitHub repository</a>.</p>
+</div>
+<div id="learn-more" class="section level2">
+<h2>Learn more</h2>
+<p>Check out our other guide:</p>
+<ul>
+<li><a href="https://ipea.github.io/gtfs2emis/articles/gtfs2emis_non_exhaust_ef.html">Exploring
+Non-Exhaust Emission Factors</a></li>
+</ul>
+</div>
+<div id="report-a-bug" class="section level2">
+<h2>Report a bug</h2>
+<p>If you have any suggestions or want to report an error, please visit
+<a href="https://github.com/ipea/gtfs2emis/issues">the package GitHub
+page</a>.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

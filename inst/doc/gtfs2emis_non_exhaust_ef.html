@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+<meta name="date" content="2026-11-26" />
+
+<title>Exploring Non-Exhaust Emission Factors</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Exploring Non-Exhaust Emission Factors</h1>
+<h4 class="date">2026-11-26</h4>
+
+
+
+<p>Vehicles also emit particles from processes other than combustion:
+tyre, brake and road surface wear. An emissions inventory for
+particulate matter should include them. <code>gtfs2emis</code>
+implements the non-exhaust methods of the <a href="https://www.eea.europa.eu//publications/emep-eea-guidebook-2019">EMEP/EEA
+guidebook</a> in <code>emi_europe_emep_wear()</code>.</p>
+<p>Tyre and brake wear emissions are computed as:</p>
+<p><span class="math display">\[
+TE(i) = dist \times EF_{tsp}(j) \times mf_s(i) \times SC(speed)
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(TE(i)\)</span> = total emissions of
+pollutant <span class="math inline">\(i\)</span> (g),</li>
+<li><span class="math inline">\(dist\)</span> = distance driven by each
+vehicle (km),</li>
+<li><span class="math inline">\(EF_{tsp}(j)\)</span> = TSP (Total
+Suspended Particle) mass emission factor for vehicles of category <span class="math inline">\(j\)</span> (g/km),</li>
+<li><span class="math inline">\(mf_s(i)\)</span> = mass fraction of TSP
+that can be attributed to pollutant <span class="math inline">\(i\)</span>,</li>
+<li><span class="math inline">\(SC(speed)\)</span> = correction factor
+for a mean vehicle travelling at a given speed (-).</li>
+</ul>
+<div id="tyre" class="section level2">
+<h2>Tyre</h2>
+<p>For heavy-duty vehicles such as buses, the tyre-wear emission factor
+accounts for vehicle size (number of axles) and load:</p>
+<p><span class="math display">\[EFTSP^{hdv}_{tyre} = 0.5 \times N_{axle}
+\times LCF_{tyre} \times EFTSP^{pc}_{tyre}\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(EFTSP^{hdv}_{tyre}\)</span> = TSP
+emission factor for tyre wear from heavy-duty vehicles (g/km),</li>
+<li><span class="math inline">\(N_{axle}\)</span> = number of vehicle
+axles (-),</li>
+<li><span class="math inline">\(LCF_{tyre}\)</span> = a load correction
+factor for tyre wear (-),</li>
+<li><span class="math inline">\(EFTSP^{pc}_{tyre}\)</span> = TSP
+emission factor for tyre wear from passenger car vehicles, 0.0107
+g/km.</li>
+</ul>
+<p>and <span class="math display">\[LCF_{tyre} = 1.41 + (1.38 \times
+LF)\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(LF\)</span> = load factor (-), ranging
+from 0 for an empty bus to 1 for a fully laden one.</li>
+</ul>
+<p>The function uses the following number of axles for each vehicle
+class:</p>
+<table>
+<thead>
+<tr class="header">
+<th>vehicle class (j)</th>
+<th>number of axles</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ubus Midi &lt;=15 t</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td>Ubus Std 15 - 18 t</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>Ubus Artic &gt;18 t</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>Coaches Std &lt;=18 t</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>Coaches Artic &gt;18 t</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>The size distribution of tyre wear particles is:</p>
+<table>
+<thead>
+<tr class="header">
+<th>particle size class (i)</th>
+<th>mass fraction of TSP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>TSP</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>PM10</td>
+<td>0.600</td>
+</tr>
+<tr class="odd">
+<td>PM2.5</td>
+<td>0.420</td>
+</tr>
+<tr class="even">
+<td>PM1.0</td>
+<td>0.060</td>
+</tr>
+<tr class="odd">
+<td>PM0.1</td>
+<td>0.048</td>
+</tr>
+</tbody>
+</table>
+<p>Finally, the speed correction is:</p>
+<ul>
+<li><span class="math inline">\(SC_{tyre}(speed) = 1.39\)</span>, when
+<span class="math inline">\(speed &lt; 40\)</span> km/h;</li>
+<li><span class="math inline">\(SC_{tyre}(speed) = -0.00974 \times speed
++ 1.78\)</span>, when <span class="math inline">\(40 \le speed \le
+90\)</span> km/h;</li>
+<li><span class="math inline">\(SC_{tyre}(speed) = 0.902\)</span>, when
+<span class="math inline">\(speed &gt; 90\)</span> km/h.</li>
+</ul>
+<p>In <code>emi_europe_emep_wear()</code>, this process is selected with
+<code>process = &quot;tyre&quot;</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(gtfs2emis)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">emi_europe_emep_wear</span>(<span class="at">dist =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">1</span>, <span class="st">&quot;km&quot;</span>),</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>                     <span class="at">speed =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">30</span>, <span class="st">&quot;km/h&quot;</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>                     <span class="at">pollutant =</span> <span class="fu">c</span>(<span class="st">&quot;PM10&quot;</span>, <span class="st">&quot;TSP&quot;</span>, <span class="st">&quot;PM2.5&quot;</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>                     <span class="at">veh_type =</span> <span class="st">&quot;Ubus Std 15 - 18 t&quot;</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>                     <span class="at">fleet_composition =</span> <span class="dv">1</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>                     <span class="at">load =</span> <span class="fl">0.5</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>                     <span class="at">process =</span> <span class="st">&quot;tyre&quot;</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>                     <span class="at">as_list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; $pollutant</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;PM10&quot;  &quot;TSP&quot;   &quot;PM2.5&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; $veh_type</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Ubus Std 15 - 18 t&quot;</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; $fleet_composition</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt; $speed</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt; 30 [km/h]</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co">#&gt; $dist</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="co">#&gt; 1 [km]</span></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co">#&gt; $emi</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="co">#&gt;    PM10_tyre_veh_1 TSP_tyre_veh_1 PM2.5_tyre_veh_1</span></span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="co">#&gt;            &lt;units&gt;        &lt;units&gt;          &lt;units&gt;</span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co">#&gt; 1:  0.01873998 [g]  0.0312333 [g]   0.01311799 [g]</span></span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="co">#&gt; $process</span></span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="co">#&gt; [1] &quot;tyre&quot;</span></span></code></pre></div>
+</div>
+<div id="brake" class="section level2">
+<h2>Brake</h2>
+<p>The heavy-duty vehicle emission factor is the passenger car factor,
+adjusted to match measurements from heavy-duty vehicles:</p>
+<p><span class="math display">\[EFTSP^{hdv}_{brake} = 1.956 \times
+LCF_{brake} \times EFTSP^{pc}_{brake}\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(EFTSP^{hdv}_{brake}\)</span> =
+heavy-duty vehicle emission factor for TSP,</li>
+<li><span class="math inline">\(LCF_{brake}\)</span> = load correction
+factor for brake wear,</li>
+<li><span class="math inline">\(EFTSP^{pc}_{brake}\)</span> = passenger
+car emission factor for TSP, 0.0122 g/km.</li>
+</ul>
+<p><span class="math display">\[LCF_{brake} = 1 + (0.79 \times
+LF),\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(LF\)</span> = load factor (-), ranging
+from 0 for an empty bus to 1 for a fully laden one.</li>
+</ul>
+<p>The size distribution of brake wear particles is:</p>
+<table>
+<thead>
+<tr class="header">
+<th>particle size class (i)</th>
+<th>mass fraction of TSP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>TSP</td>
+<td>1.000</td>
+</tr>
+<tr class="even">
+<td>PM10</td>
+<td>0.980</td>
+</tr>
+<tr class="odd">
+<td>PM2.5</td>
+<td>0.390</td>
+</tr>
+<tr class="even">
+<td>PM1.0</td>
+<td>0.100</td>
+</tr>
+<tr class="odd">
+<td>PM0.1</td>
+<td>0.080</td>
+</tr>
+</tbody>
+</table>
+<p>Finally, the speed correction is:</p>
+<ul>
+<li><span class="math inline">\(SC_{brake}(speed) = 1.67\)</span>, when
+<span class="math inline">\(speed &lt; 40\)</span> km/h;</li>
+<li><span class="math inline">\(SC_{brake}(speed) = -0.0270 \times speed
++ 2.75\)</span>, when <span class="math inline">\(40 \le speed \le
+95\)</span> km/h;</li>
+<li><span class="math inline">\(SC_{brake}(speed) = 0.185\)</span>, when
+<span class="math inline">\(speed &gt; 95\)</span> km/h.</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">emi_europe_emep_wear</span>(<span class="at">dist =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">1</span>, <span class="st">&quot;km&quot;</span>),</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>                     <span class="at">speed =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">30</span>, <span class="st">&quot;km/h&quot;</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                     <span class="at">pollutant =</span> <span class="fu">c</span>(<span class="st">&quot;PM10&quot;</span>, <span class="st">&quot;TSP&quot;</span>, <span class="st">&quot;PM2.5&quot;</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                     <span class="at">veh_type =</span> <span class="st">&quot;Ubus Std 15 - 18 t&quot;</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>                     <span class="at">fleet_composition =</span> <span class="dv">1</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>                     <span class="at">load =</span> <span class="fl">0.5</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>                     <span class="at">process =</span> <span class="st">&quot;brake&quot;</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>                     <span class="at">as_list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; $pollutant</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;PM10&quot;  &quot;TSP&quot;   &quot;PM2.5&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; $veh_type</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Ubus Std 15 - 18 t&quot;</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; $fleet_composition</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; $speed</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; 30 [km/h]</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; $dist</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; 1 [km]</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; $emi</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt;    PM10_brake_veh_1 TSP_brake_veh_1 PM2.5_brake_veh_1</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt;             &lt;units&gt;         &lt;units&gt;           &lt;units&gt;</span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; 1:   0.05448105 [g]   0.0555929 [g]    0.02168123 [g]</span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt; $process</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt; [1] &quot;brake&quot;</span></span></code></pre></div>
+</div>
+<div id="road-wear" class="section level2">
+<h2>Road Wear</h2>
+<p>Road wear emissions do not depend on speed:</p>
+<p><span class="math display">\[TE(i) = dist \times EF^{road}_{tsp}(j)
+\times mf_{road}\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(TE(i)\)</span> = total emissions of
+pollutant i (g),</li>
+<li><span class="math inline">\(dist\)</span> = total distance driven by
+vehicles in category j (km),</li>
+<li><span class="math inline">\(EF^{road}_{tsp}\)</span> = TSP mass
+emission factor from road wear for vehicles j (0.0760 g/km),</li>
+<li><span class="math inline">\(mf_{road}\)</span> = mass fraction of
+TSP that can be attributed to particle size class i (-).</li>
+</ul>
+<p>The size distribution of road surface wear particles is:</p>
+<table>
+<thead>
+<tr class="header">
+<th>particle size class (i)</th>
+<th>mass fraction of TSP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>TSP</td>
+<td>1.00</td>
+</tr>
+<tr class="even">
+<td>PM10</td>
+<td>0.50</td>
+</tr>
+<tr class="odd">
+<td>PM2.5</td>
+<td>0.27</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">emi_europe_emep_wear</span>(<span class="at">dist =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">1</span>, <span class="st">&quot;km&quot;</span>),</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                     <span class="at">speed =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">30</span>, <span class="st">&quot;km/h&quot;</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                     <span class="at">pollutant =</span> <span class="fu">c</span>(<span class="st">&quot;PM10&quot;</span>, <span class="st">&quot;TSP&quot;</span>, <span class="st">&quot;PM2.5&quot;</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>                     <span class="at">veh_type =</span> <span class="st">&quot;Ubus Std 15 - 18 t&quot;</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>                     <span class="at">fleet_composition =</span> <span class="dv">1</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>                     <span class="at">load =</span> <span class="fl">0.5</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>                     <span class="at">process =</span> <span class="st">&quot;road&quot;</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>                     <span class="at">as_list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; $pollutant</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;PM10&quot;  &quot;TSP&quot;   &quot;PM2.5&quot;</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; $veh_type</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Ubus Std 15 - 18 t&quot;</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; $fleet_composition</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; $speed</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; 30 [km/h]</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; $dist</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; 1 [km]</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; $emi</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt;    PM10_road_veh_1 TSP_road_veh_1 PM2.5_road_veh_1</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt;            &lt;units&gt;        &lt;units&gt;          &lt;units&gt;</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; 1:       0.038 [g]      0.076 [g]      0.02052 [g]</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; $process</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; [1] &quot;road&quot;</span></span></code></pre></div>
+</div>
+<div id="viewing-emissions" class="section level2">
+<h2>Viewing emissions</h2>
+<p>A single call can estimate several processes at once. Here we compute
+tyre, brake and road wear emissions over 1 km at speeds from 1 to 100
+km/h:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">library</span>(units)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>emis_list <span class="ot">&lt;-</span> <span class="fu">emi_europe_emep_wear</span>(<span class="at">dist =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">100</span>), <span class="st">&quot;km&quot;</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>                                  <span class="at">speed =</span> units<span class="sc">::</span><span class="fu">set_units</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="st">&quot;km/h&quot;</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>                                  <span class="at">pollutant =</span> <span class="fu">c</span>(<span class="st">&quot;PM10&quot;</span>, <span class="st">&quot;TSP&quot;</span>, <span class="st">&quot;PM2.5&quot;</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>                                  <span class="at">veh_type =</span> <span class="st">&quot;Ubus Std 15 - 18 t&quot;</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>                                  <span class="at">fleet_composition =</span> <span class="dv">1</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>                                  <span class="at">load =</span> <span class="fl">0.5</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>                                  <span class="at">process =</span> <span class="fu">c</span>(<span class="st">&quot;brake&quot;</span>, <span class="st">&quot;tyre&quot;</span>, <span class="st">&quot;road&quot;</span>),</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>                                  <span class="at">as_list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>ef_dt <span class="ot">&lt;-</span> <span class="fu">emis_to_dt</span>(emis_list,</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>                    <span class="at">emi_vars =</span> <span class="st">&quot;emi&quot;</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>                    <span class="at">segment_vars =</span> <span class="st">&quot;speed&quot;</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="fu">ggplot</span>(ef_dt) <span class="sc">+</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(speed), <span class="at">y =</span> <span class="fu">as.numeric</span>(emi), <span class="at">color =</span> pollutant)) <span class="sc">+</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(process)) <span class="sc">+</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Speed (km/h)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Emissions (g)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>With the output of <code>transport_model()</code>, you can compare
+hot-exhaust and non-exhaust emissions on a real network, in three steps:
+a) estimate both types of emissions, b) aggregate them on a spatial
+grid, and c) plot them.</p>
+<div id="a-estimating-hot-exhaust-and-non-exhaust-emissions" class="section level3">
+<h3>a) Estimating hot-exhaust and non-exhaust emissions</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">library</span>(gtfstools)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># read GTFS</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>gtfs_file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/bra_cur_gtfs.zip&quot;</span>, <span class="at">package =</span> <span class="st">&quot;gtfs2emis&quot;</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>gtfs <span class="ot">&lt;-</span> gtfstools<span class="sc">::</span><span class="fu">read_gtfs</span>(gtfs_file)</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co"># keep a single trip_id to speed up this example</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>gtfs_small <span class="ot">&lt;-</span> gtfstools<span class="sc">::</span><span class="fu">filter_by_trip_id</span>(gtfs, <span class="at">trip_id =</span> <span class="st">&quot;4451136&quot;</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co"># run transport model</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>tp_model <span class="ot">&lt;-</span> <span class="fu">transport_model</span>(<span class="at">gtfs_data =</span> gtfs_small,</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>                            <span class="at">spatial_resolution =</span> <span class="dv">100</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co"># fleet data for the EMEP/EEA model (a single bus type)</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>fleet_data_ef_emep <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">veh_type =</span> <span class="st">&quot;Ubus Std 15 - 18 t&quot;</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>                                 <span class="at">fleet_composition =</span> <span class="dv">1</span>,</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>                                 <span class="at">euro =</span> <span class="st">&quot;V&quot;</span>,   <span class="co"># for hot-exhaust emissions</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>                                 <span class="at">fuel =</span> <span class="st">&quot;D&quot;</span>,   <span class="co"># for hot-exhaust emissions</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>                                 <span class="at">tech =</span> <span class="st">&quot;SCR&quot;</span>) <span class="co"># for hot-exhaust emissions</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co"># emission model (hot-exhaust)</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>emi_list_he <span class="ot">&lt;-</span> <span class="fu">emission_model</span>(<span class="at">tp_model =</span> tp_model,</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>                              <span class="at">ef_model =</span> <span class="st">&quot;ef_europe_emep&quot;</span>,</span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>                              <span class="at">fleet_data =</span> fleet_data_ef_emep,</span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>                              <span class="at">pollutant =</span> <span class="st">&quot;PM10&quot;</span>)</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co"># emission model (non-exhaust)</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>emi_list_ne <span class="ot">&lt;-</span> <span class="fu">emi_europe_emep_wear</span>(<span class="at">dist =</span> tp_model<span class="sc">$</span>dist,</span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a>                                    <span class="at">speed =</span> tp_model<span class="sc">$</span>speed,</span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a>                                    <span class="at">pollutant =</span> <span class="st">&quot;PM10&quot;</span>,</span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a>                                    <span class="at">veh_type =</span> <span class="st">&quot;Ubus Std 15 - 18 t&quot;</span>,</span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a>                                    <span class="at">fleet_composition =</span> <span class="dv">1</span>,</span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a>                                    <span class="at">load =</span> <span class="fl">0.5</span>,</span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a>                                    <span class="at">process =</span> <span class="fu">c</span>(<span class="st">&quot;brake&quot;</span>, <span class="st">&quot;tyre&quot;</span>, <span class="st">&quot;road&quot;</span>),</span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>                                    <span class="at">as_list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a><span class="co"># attach the transport model so emis_grid() and emis_summary() can use it</span></span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>emi_list_ne<span class="sc">$</span>tp_model <span class="ot">&lt;-</span> tp_model</span></code></pre></div>
+</div>
+<div id="b-aggregating-emissions-on-a-spatial-grid" class="section level3">
+<h3>b) Aggregating emissions on a spatial grid</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># create spatial grid</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>grid <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_make_grid</span>(<span class="at">x =</span> sf<span class="sc">::</span><span class="fu">st_make_valid</span>(tp_model),</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>                         <span class="at">cellsize =</span> <span class="fl">0.25</span> <span class="sc">/</span> <span class="dv">200</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>                         <span class="at">crs =</span> <span class="dv">4326</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>                         <span class="at">what =</span> <span class="st">&quot;polygons&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>                         <span class="at">square =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co"># grid (hot-exhaust)</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>emi_grid_he <span class="ot">&lt;-</span> <span class="fu">emis_grid</span>(emi_list_he,</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>                         <span class="at">grid =</span> grid,</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>                         <span class="at">time_resolution =</span> <span class="st">&quot;day&quot;</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>                         <span class="at">aggregate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>data.table<span class="sc">::</span><span class="fu">setDT</span>(emi_grid_he)</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>pol_names <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(emi_grid_he), <span class="st">&quot;geometry&quot;</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>emi_grid_he_dt <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">melt</span>(emi_grid_he,</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>                                   <span class="at">measure.vars =</span> pol_names,</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>                                   <span class="at">id.vars =</span> <span class="st">&quot;geometry&quot;</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>emi_grid_he_dt <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_as_sf</span>(emi_grid_he_dt)</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co"># grid (non-exhaust)</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>emi_grid_ne <span class="ot">&lt;-</span> <span class="fu">emis_grid</span>(emi_list_ne,</span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>                         <span class="at">grid =</span> grid,</span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>                         <span class="at">time_resolution =</span> <span class="st">&quot;day&quot;</span>,</span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>                         <span class="at">aggregate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>data.table<span class="sc">::</span><span class="fu">setDT</span>(emi_grid_ne)</span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>pol_names <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(emi_grid_ne), <span class="st">&quot;geometry&quot;</span>)</span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>emi_grid_ne_dt <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">melt</span>(emi_grid_ne,</span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a>                                   <span class="at">measure.vars =</span> pol_names,</span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>                                   <span class="at">id.vars =</span> <span class="st">&quot;geometry&quot;</span>)</span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a>emi_grid_ne_dt <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_as_sf</span>(emi_grid_ne_dt)</span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a><span class="co"># bind grids</span></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a>emi_grid_dt <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">rbindlist</span>(<span class="at">l =</span> <span class="fu">list</span>(emi_grid_he_dt, emi_grid_ne_dt))</span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a>emi_grid_sf <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_as_sf</span>(emi_grid_dt)</span></code></pre></div>
+</div>
+<div id="c-plotting-the-emissions" class="section level3">
+<h3>c) Plotting the emissions</h3>
+<p>The map shows daily <code>PM10</code> emissions in each grid cell, by
+process:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">ggplot</span>(emi_grid_sf) <span class="sc">+</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">as.numeric</span>(value)), <span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> tp_model<span class="sc">$</span>geometry, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="fu">scale_fill_continuous</span>(<span class="at">type =</span> <span class="st">&quot;viridis&quot;</span>) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">&quot;PM10 (g)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(variable), <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="fu">theme_void</span>()</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>And the bar chart compares the total emissions of each process:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># emissions by time</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>emi_time_he <span class="ot">&lt;-</span> <span class="fu">emis_summary</span>(emi_list_he, <span class="at">by =</span> <span class="st">&quot;time&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>emi_time_ne <span class="ot">&lt;-</span> <span class="fu">emis_summary</span>(emi_list_ne, <span class="at">by =</span> <span class="st">&quot;time&quot;</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>emi_time <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">rbindlist</span>(<span class="at">l =</span> <span class="fu">list</span>(emi_time_he, emi_time_ne))</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="fu">ggplot</span>(emi_time) <span class="sc">+</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> process, <span class="at">y =</span> <span class="fu">as.numeric</span>(emi), <span class="at">fill =</span> <span class="fu">as.numeric</span>(emi))) <span class="sc">+</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="fu">scale_fill_continuous</span>(<span class="at">type =</span> <span class="st">&quot;viridis&quot;</span>) <span class="sc">+</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">&quot;PM10 (g)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Emissions (g)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+</div>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>EMEP/EEA data and reports can be accessed in the following links:</p>
+<ul>
+<li>2019 edition <a href="https://www.eea.europa.eu//publications/emep-eea-guidebook-2019">EMEP-EEA</a>.</li>
+</ul>
+</div>
+<div id="report-a-bug" class="section level2">
+<h2>Report a bug</h2>
+<p>If you have any suggestions or want to report an error, please visit
+<a href="https://github.com/ipea/gtfs2emis/issues">the package GitHub
+page</a>.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
